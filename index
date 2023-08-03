@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integrated Canvas Example</title>
+<style>
+  canvas {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    border-radius: 5px;
+    background: #f5f5f5;
+    border: 1px solid #eee;
+    padding: 5px;
+    outline: 1px solid #eee;
+  }
+</style>
+</head>
+<body>
+<canvas id="myCanvas" width="800" height="600"></canvas>
+<script>
+  var canvas = document.getElementById("myCanvas");
+  canvas.width = window.innerWidth * 0.7;
+  canvas.height = window.innerHeight * 0.7;
+
+  var ctx = canvas.getContext("2d");
+  var gridSize = canvas.width / 50;
+  var numLinesX = canvas.width / gridSize;
+  var numLinesY = canvas.height / gridSize;
+  var lines = [];
+
+  createLines();
+  drawLines();
+
+  window.addEventListener("resize", resizeCanvas);
+  document.addEventListener("mousemove", function (event) {
+    var rect = canvas.getBoundingClientRect();
+    var mouseX = event.clientX - rect.left;
+    var mouseY = event.clientY - rect.top;
+
+    lines.forEach(function (line) {
+      var dx = mouseX - line.x;
+      var dy = mouseY - line.y;
+      line.angle = Math.atan2(dy, dx);
+    });
+
+    drawLines();
+  });
+
+  function createLines() {
+    lines = [];
+    for (var i = 0; i < numLinesX; i++) {
+      for (var j = 0; j < numLinesY; j++) {
+        var line = {
+          x: i * gridSize - 4,
+          y: j * gridSize - 4,
+          angle: Math.floor(Math.random() * 360)
+        };
+        lines.push(line);
+      }
+    }
+  }
+
+  function drawLines() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    lines.forEach(function (line) {
+      ctx.beginPath();
+      ctx.moveTo(line.x, line.y);
+      ctx.lineTo(
+        line.x + Math.cos(line.angle) * gridSize,
+        line.y + Math.sin(line.angle) * gridSize
+      );
+      ctx.strokeStyle = "black";
+      ctx.stroke();
+      ctx.closePath();
+    });
+  }
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth * 0.7;
+    canvas.height = window.innerHeight * 0.7;
+    gridSize = canvas.width / 50;
+    numLinesX = canvas.width / gridSize;
+    numLinesY = canvas.height / gridSize;
+    drawLines();
+    createLines();
+  }
+</script>
+</body>
+</html>
